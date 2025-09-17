@@ -1,0 +1,538 @@
+{
+  "project": {
+    "name": "EpiTrello",
+    "description": "Web-based project management application inspired by Trello",
+    "columns": ["To Do", "In Progress", "Done"]
+  },
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Environment Setup",
+      "description": "Set up development environment, dependencies, and tooling for the EpiTrello project",
+      "phase": "Foundation & Setup",
+      "priority": "High",
+      "effort": "Medium",
+      "acceptanceCriteria": [
+        "Development environment configured",
+        "Package.json created with necessary dependencies",
+        "Build and development scripts working",
+        "Code formatting and linting tools configured"
+      ],
+      "technicalRequirements": [
+        "Node.js and npm/yarn setup",
+        "Next.js framework configuration",
+        "TypeScript configuration",
+        "ESLint and Prettier setup"
+      ],
+      "dependencies": [],
+      "column": "To Do"
+    },
+    {
+      "id": 2,
+      "title": "Folders Setup",
+      "description": "Create project structure and organize codebase with proper folder hierarchy",
+      "phase": "Foundation & Setup",
+      "priority": "High",
+      "effort": "Small",
+      "acceptanceCriteria": [
+        "Project folder structure created",
+        "Components organized by feature",
+        "Utilities and helpers properly structured",
+        "Asset folders configured"
+      ],
+      "technicalRequirements": [
+        "Standard Next.js folder structure",
+        "Component organization by feature",
+        "Shared utilities folder",
+        "Public assets organization"
+      ],
+      "dependencies": ["Environment Setup"],
+      "column": "To Do"
+    },
+    {
+      "id": 3,
+      "title": "Marketing Page",
+      "description": "Create landing page and initial UI for the EpiTrello application",
+      "phase": "Foundation & Setup",
+      "priority": "Medium",
+      "effort": "Medium",
+      "acceptanceCriteria": [
+        "Landing page designed and implemented",
+        "Responsive design working on all devices",
+        "Call-to-action buttons functional",
+        "Basic styling and branding applied"
+      ],
+      "technicalRequirements": [
+        "React components for landing page",
+        "CSS/Tailwind styling",
+        "Responsive design implementation",
+        "SEO meta tags"
+      ],
+      "dependencies": ["Folders Setup"],
+      "column": "To Do"
+    },
+    {
+      "id": 4,
+      "title": "Authentication",
+      "description": "Implement user authentication system with login, registration, and session management",
+      "phase": "Core Authentication & Organization",
+      "priority": "High",
+      "effort": "Large",
+      "acceptanceCriteria": [
+        "User registration functionality",
+        "User login/logout functionality",
+        "Session management implemented",
+        "Password security measures in place",
+        "Authentication state management"
+      ],
+      "technicalRequirements": [
+        "NextAuth.js or similar authentication library",
+        "Database integration for user data",
+        "JWT token management",
+        "Protected route implementation"
+      ],
+      "dependencies": ["Environment Setup", "Folders Setup"],
+      "column": "To Do"
+    },
+    {
+      "id": 5,
+      "title": "Organizations",
+      "description": "Create organization management functionality for multi-user workspaces",
+      "phase": "Core Authentication & Organization",
+      "priority": "High",
+      "effort": "Large",
+      "acceptanceCriteria": [
+        "Organization creation functionality",
+        "User invitation system",
+        "Role-based permissions",
+        "Organization settings management"
+      ],
+      "technicalRequirements": [
+        "Database schema for organizations",
+        "User-organization relationship management",
+        "Permission system implementation",
+        "Invitation email system"
+      ],
+      "dependencies": ["Authentication"],
+      "column": "To Do"
+    },
+    {
+      "id": 6,
+      "title": "Sidebar",
+      "description": "Create navigation sidebar component for application navigation",
+      "phase": "UI Components & Navigation",
+      "priority": "Medium",
+      "effort": "Medium",
+      "acceptanceCriteria": [
+        "Sidebar component created",
+        "Navigation items properly linked",
+        "Collapsible functionality",
+        "User context displayed"
+      ],
+      "technicalRequirements": [
+        "React sidebar component",
+        "Navigation state management",
+        "Responsive sidebar behavior",
+        "Icon integration"
+      ],
+      "dependencies": ["Authentication", "Organizations"],
+      "column": "To Do"
+    },
+    {
+      "id": 7,
+      "title": "Workspace Settings",
+      "description": "Implement workspace configuration and settings management",
+      "phase": "Core Authentication & Organization",
+      "priority": "Medium",
+      "effort": "Medium",
+      "acceptanceCriteria": [
+        "Workspace settings page created",
+        "Settings persistence functionality",
+        "User preferences management",
+        "Theme and display options"
+      ],
+      "technicalRequirements": [
+        "Settings form components",
+        "Local storage/database persistence",
+        "Theme management system",
+        "Validation and error handling"
+      ],
+      "dependencies": ["Organizations", "Sidebar"],
+      "column": "To Do"
+    },
+    {
+      "id": 8,
+      "title": "Server Actions",
+      "description": "Implement server-side action handlers for data operations",
+      "phase": "UI Components & Navigation",
+      "priority": "High",
+      "effort": "Large",
+      "acceptanceCriteria": [
+        "Server action framework implemented",
+        "CRUD operations for all entities",
+        "Error handling and validation",
+        "Database integration complete"
+      ],
+      "technicalRequirements": [
+        "Next.js server actions",
+        "Database ORM integration",
+        "Input validation system",
+        "Error handling middleware"
+      ],
+      "dependencies": ["Authentication", "Organizations"],
+      "column": "To Do"
+    },
+    {
+      "id": 9,
+      "title": "useAction abstraction",
+      "description": "Create reusable action hooks for client-server communication",
+      "phase": "UI Components & Navigation",
+      "priority": "Medium",
+      "effort": "Medium",
+      "acceptanceCriteria": [
+        "Custom hooks for server actions",
+        "Loading and error states management",
+        "Optimistic updates support",
+        "Reusable across components"
+      ],
+      "technicalRequirements": [
+        "React custom hooks",
+        "State management for async operations",
+        "TypeScript type definitions",
+        "Error boundary integration"
+      ],
+      "dependencies": ["Server Actions"],
+      "column": "To Do"
+    },
+    {
+      "id": 10,
+      "title": "Form Components",
+      "description": "Build reusable form components for consistent UI",
+      "phase": "UI Components & Navigation",
+      "priority": "Medium",
+      "effort": "Medium",
+      "acceptanceCriteria": [
+        "Reusable form components created",
+        "Form validation system implemented",
+        "Consistent styling across forms",
+        "Accessibility features included"
+      ],
+      "technicalRequirements": [
+        "React form components library",
+        "Form validation with schema",
+        "CSS/Tailwind form styling",
+        "ARIA accessibility attributes"
+      ],
+      "dependencies": ["useAction abstraction"],
+      "column": "To Do"
+    },
+    {
+      "id": 11,
+      "title": "Board Popover Form",
+      "description": "Create board creation and editing forms with popover interface",
+      "phase": "Board Management",
+      "priority": "High",
+      "effort": "Medium",
+      "acceptanceCriteria": [
+        "Board creation form implemented",
+        "Board editing functionality",
+        "Popover component working",
+        "Form validation in place"
+      ],
+      "technicalRequirements": [
+        "Popover/modal component",
+        "Board form with validation",
+        "Integration with server actions",
+        "UI feedback for actions"
+      ],
+      "dependencies": ["Form Components", "Server Actions"],
+      "column": "To Do"
+    },
+    {
+      "id": 12,
+      "title": "Board Server Action",
+      "description": "Implement server actions for board management operations",
+      "phase": "Board Management",
+      "priority": "High",
+      "effort": "Large",
+      "acceptanceCriteria": [
+        "Board CRUD operations implemented",
+        "Board sharing functionality",
+        "Permission checks in place",
+        "Data validation complete"
+      ],
+      "technicalRequirements": [
+        "Server actions for boards",
+        "Database schema for boards",
+        "Permission validation",
+        "Error handling and logging"
+      ],
+      "dependencies": ["Server Actions", "Organizations"],
+      "column": "To Do"
+    },
+    {
+      "id": 13,
+      "title": "Board List",
+      "description": "Create board listing functionality with filtering and search",
+      "phase": "Board Management",
+      "priority": "High",
+      "effort": "Medium",
+      "acceptanceCriteria": [
+        "Board list component created",
+        "Search and filter functionality",
+        "Pagination implemented",
+        "Board previews working"
+      ],
+      "technicalRequirements": [
+        "Board list React component",
+        "Search and filter logic",
+        "Pagination component",
+        "Board thumbnail generation"
+      ],
+      "dependencies": ["Board Server Action", "Form Components"],
+      "column": "To Do"
+    },
+    {
+      "id": 14,
+      "title": "Board Page",
+      "description": "Implement individual board pages with full board functionality",
+      "phase": "Board Management",
+      "priority": "High",
+      "effort": "Large",
+      "acceptanceCriteria": [
+        "Individual board pages implemented",
+        "Board header and settings",
+        "Real-time updates working",
+        "Board sharing controls"
+      ],
+      "technicalRequirements": [
+        "Dynamic routing for boards",
+        "Real-time synchronization",
+        "Board component architecture",
+        "WebSocket or polling for updates"
+      ],
+      "dependencies": ["Board List", "Board Popover Form"],
+      "column": "To Do"
+    },
+    {
+      "id": 15,
+      "title": "List Component",
+      "description": "Create list components for boards with card management",
+      "phase": "List Management",
+      "priority": "High",
+      "effort": "Large",
+      "acceptanceCriteria": [
+        "List component implemented",
+        "Card container functionality",
+        "List ordering and positioning",
+        "Visual feedback for actions"
+      ],
+      "technicalRequirements": [
+        "List React component",
+        "Card management within lists",
+        "Drag and drop foundation",
+        "State management for lists"
+      ],
+      "dependencies": ["Board Page"],
+      "column": "To Do"
+    },
+    {
+      "id": 16,
+      "title": "List Header",
+      "description": "Implement list header functionality with title editing and actions",
+      "phase": "List Management",
+      "priority": "Medium",
+      "effort": "Medium",
+      "acceptanceCriteria": [
+        "List header component created",
+        "Inline title editing",
+        "List action menu",
+        "Card count display"
+      ],
+      "technicalRequirements": [
+        "Header component with editing",
+        "Dropdown menu component",
+        "Inline editing functionality",
+        "Real-time title updates"
+      ],
+      "dependencies": ["List Component"],
+      "column": "To Do"
+    },
+    {
+      "id": 17,
+      "title": "List Options",
+      "description": "Add list management options including copy, move, and archive",
+      "phase": "List Management",
+      "priority": "Medium",
+      "effort": "Medium",
+      "acceptanceCriteria": [
+        "List options menu implemented",
+        "Copy list functionality",
+        "Move list between boards",
+        "Archive/delete list options"
+      ],
+      "technicalRequirements": [
+        "Options dropdown component",
+        "List manipulation server actions",
+        "Confirmation dialogs",
+        "Bulk operations support"
+      ],
+      "dependencies": ["List Header", "Board Server Action"],
+      "column": "To Do"
+    },
+    {
+      "id": 18,
+      "title": "Card Form",
+      "description": "Create card creation and editing forms with rich content support",
+      "phase": "Card Management",
+      "priority": "High",
+      "effort": "Large",
+      "acceptanceCriteria": [
+        "Card creation form implemented",
+        "Rich text editing support",
+        "Due date and assignment features",
+        "Label and attachment support"
+      ],
+      "technicalRequirements": [
+        "Card form component",
+        "Rich text editor integration",
+        "Date picker component",
+        "File upload functionality"
+      ],
+      "dependencies": ["Form Components", "List Component"],
+      "column": "To Do"
+    },
+    {
+      "id": 19,
+      "title": "Drag n' Drop",
+      "description": "Implement drag and drop functionality for cards and lists",
+      "phase": "Card Management",
+      "priority": "High",
+      "effort": "Large",
+      "acceptanceCriteria": [
+        "Card drag and drop working",
+        "List reordering functionality",
+        "Visual feedback during drag",
+        "Touch device support"
+      ],
+      "technicalRequirements": [
+        "Drag and drop library integration",
+        "Touch gesture support",
+        "Visual drag indicators",
+        "State synchronization"
+      ],
+      "dependencies": ["List Component", "Card Form"],
+      "column": "To Do"
+    },
+    {
+      "id": 20,
+      "title": "Card Modal",
+      "description": "Create detailed card view modal with all card features",
+      "phase": "Card Management",
+      "priority": "High",
+      "effort": "Large",
+      "acceptanceCriteria": [
+        "Card modal component created",
+        "Full card details display",
+        "Inline editing capabilities",
+        "Activity history visible"
+      ],
+      "technicalRequirements": [
+        "Modal component with routing",
+        "Card detail views",
+        "Inline editing components",
+        "Activity timeline component"
+      ],
+      "dependencies": ["Card Form", "Drag n' Drop"],
+      "column": "To Do"
+    },
+    {
+      "id": 21,
+      "title": "Card Actions",
+      "description": "Implement card action functionality including copy, move, and archive",
+      "phase": "Card Management",
+      "priority": "Medium",
+      "effort": "Medium",
+      "acceptanceCriteria": [
+        "Card actions menu implemented",
+        "Copy card functionality",
+        "Move card between lists/boards",
+        "Archive and delete options"
+      ],
+      "technicalRequirements": [
+        "Card actions dropdown",
+        "Card manipulation server actions",
+        "Board/list selection components",
+        "Bulk action support"
+      ],
+      "dependencies": ["Card Modal", "Board Server Action"],
+      "column": "To Do"
+    },
+    {
+      "id": 22,
+      "title": "Activity Logs",
+      "description": "Implement activity tracking and logs for all user actions",
+      "phase": "Advanced Features",
+      "priority": "Medium",
+      "effort": "Large",
+      "acceptanceCriteria": [
+        "Activity logging system implemented",
+        "Activity feed display",
+        "User action tracking",
+        "Activity filtering options"
+      ],
+      "technicalRequirements": [
+        "Activity logging middleware",
+        "Activity database schema",
+        "Activity feed component",
+        "Real-time activity updates"
+      ],
+      "dependencies": ["Card Actions", "useAction abstraction"],
+      "column": "To Do"
+    },
+    {
+      "id": 23,
+      "title": "Stripe & Board Limits",
+      "description": "Add payment integration and board limits for subscription tiers",
+      "phase": "Advanced Features",
+      "priority": "Low",
+      "effort": "Large",
+      "acceptanceCriteria": [
+        "Stripe payment integration",
+        "Subscription tier management",
+        "Board limit enforcement",
+        "Billing dashboard created"
+      ],
+      "technicalRequirements": [
+        "Stripe API integration",
+        "Subscription management system",
+        "Usage tracking and limits",
+        "Payment webhook handling"
+      ],
+      "dependencies": ["Organizations", "Board Server Action"],
+      "column": "To Do"
+    },
+    {
+      "id": 24,
+      "title": "Deployment",
+      "description": "Set up production deployment and CI/CD pipeline",
+      "phase": "Deployment",
+      "priority": "High",
+      "effort": "Medium",
+      "acceptanceCriteria": [
+        "Production deployment configured",
+        "CI/CD pipeline working",
+        "Environment variables managed",
+        "Monitoring and logging setup"
+      ],
+      "technicalRequirements": [
+        "Vercel/Netlify deployment",
+        "GitHub Actions workflow",
+        "Environment configuration",
+        "Error monitoring setup"
+      ],
+      "dependencies": ["Activity Logs", "Stripe & Board Limits"],
+      "column": "To Do"
+    }
+  ]
+}

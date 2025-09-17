@@ -1,0 +1,27 @@
+{
+  "name": "epitrello",
+  "version": "1.0.0",
+  "description": "A web-based project management application inspired by Trello and the Kanban method",
+  "main": "index.js",
+  "scripts": {
+    "create-issues": "node scripts/create-issues.js",
+    "setup-project": "echo 'Please follow the SETUP_GUIDE.md for project setup instructions'"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/plv92/EpiTrello.git"
+  },
+  "keywords": [
+    "trello",
+    "kanban",
+    "project-management",
+    "task-management",
+    "collaboration"
+  ],
+  "author": "plv92",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/plv92/EpiTrello/issues"
+  },
+  "homepage": "https://github.com/plv92/EpiTrello#readme"
+}
