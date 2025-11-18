@@ -52,7 +52,7 @@ const MarketingPage =() => {
                 From high rises to the home office, the way your team works is unique—accomplish it all with Taskify.
             </div>
             <Button className="mt-6" size="lg" asChild>
-                <Link href="/signup">
+                <Link href="/sign-up">
                     Get Epitrello for free
                 </Link>
             </Button>
