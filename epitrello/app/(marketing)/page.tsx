@@ -37,7 +37,7 @@ const MarketingPage =() => {
                     No 1 task Management
                 </div>
                 <h1 className="text-3xl md:text-6xl text-center text-neutral-800 mb-6">
-                    Taskify helps team move
+                    Epitrello helps team move
                 </h1>
                 <div className="text-3xlmd:text-6xl bg-gradient-to-r from-fuchsia-600 to-pink-600
                 text-white px-4 p-2 rounded-md pb-4 w-fit">
@@ -53,7 +53,7 @@ const MarketingPage =() => {
             </div>
             <Button className="mt-6" size="lg" asChild>
                 <Link href="/signup">
-                    Get Taskify for free
+                    Get Epitrello for free
                 </Link>
             </Button>
         </div>
