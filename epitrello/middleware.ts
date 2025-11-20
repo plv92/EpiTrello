@@ -1,7 +1,28 @@
+import { RedirectToSignIn } from '@clerk/nextjs';
 import { clerkMiddleware } from '@clerk/nextjs/server';
 
 export default clerkMiddleware({
-    publicRoutes: ["/"]
+    publicRoutes: ["/"],
+    afterAuth(auth, req) {
+      if (auth.userId && auth.isPublicRoute) {
+        let path = "/select-org";
+
+        if (auth.orgId) {
+          path = `/organization/${auth.orgId}`;
+        }
+        const orgSelection = new URL(path, req.url);
+        return Response.redirect(orgSelection);
+      }
+
+      if (!auth.userId && !auth.isPublicRoute) {
+        return RedirectToSignIn({ returnBackUrl: req.url });
+      }
+
+      if (auth.userId && !auth.orgId && req.nextUrl.pathname != "/select-org") {
+        const orgSelection = new URL("/select-org", req.url);
+        return Response.redirect(orgSelection);
+      }
+  }
 });
 
 export const config = {
