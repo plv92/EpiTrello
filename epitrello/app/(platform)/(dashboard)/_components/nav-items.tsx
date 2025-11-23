@@ -1,9 +1,8 @@
 "use client";
 
 import { useRouter,  usePathname } from "next/navigation";
-import { AccordionContent, AccordionItem } from "@/components/ui/accordion";
+import { AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { cn } from "@/lib/utils";
-import { AccordionTrigger } from "@radix-ui/react-accordion";
 import Image from "next/image";
 import {
     Activity,
@@ -24,7 +23,7 @@ export type Organization = {
 interface NavItemProps {
     isExpanded: boolean;
     isActive: boolean;
-    organization: any;
+    organization: Organization;
     onExpand: (id: string) => void;
 }
 

@@ -49,7 +49,7 @@ const MarketingPage =() => {
                 TextFont.className,
                 )}>
                 Collaborate, manage projects, and reach new productivity peaks.
-                From high rises to the home office, the way your team works is unique—accomplish it all with Taskify.
+                From high rises to the home office, the way your team works is unique—accomplish it all with Epitrello.
             </div>
             <Button className="mt-6" size="lg" asChild>
                 <Link href="/sign-up">
