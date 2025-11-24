@@ -1,16 +1,16 @@
 import { Navbar } from "./_components/navbar";
 
-const DashboadrdLayout = ({
-    children
+const DashboardLayout = ({
+    children,
 }: {
-    children: React.ReactNode;
- }) => {
+    children: React.ReactNode
+}) => {
     return (
         <div className="h-full">
             <Navbar />
             {children}
         </div>
-    )
- };
+    );
+};
 
-export default DashboadrdLayout;
+export default DashboardLayout;

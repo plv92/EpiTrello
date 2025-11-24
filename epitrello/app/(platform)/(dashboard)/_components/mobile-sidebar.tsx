@@ -1,15 +1,22 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { useMobileSidebar } from "@/hooks/use-mobile-sidebar";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
-import { Sheet, SheetContent } from "@/components/ui/sheet";
-import { Sidebar } from "./sidebar";
+import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
 
-export const MobileSideBar = () => {
+import { Button } from "@/components/ui/button";
+import { Sheet, SheetContent } from "@/components/ui/sheet";
+
+import { useMobileSidebar } from "@/hooks/use-mobile-sidebar";
+import { Sidebar } from "./sidebar";
+import { Organization } from "@prisma/client";
+
+interface MobileSidebarProps {
+    organizations: Organization[];
+    currentOrgId?: string;
+}
+
+export const MobileSidebar = ({ organizations, currentOrgId }: MobileSidebarProps) => {
     const pathname = usePathname();
     const [isMounted, setIsMounted] = useState(false);
 
@@ -28,26 +35,29 @@ export const MobileSideBar = () => {
     if (!isMounted) {
         return null;
     }
+
     return (
         <>
-            <Button
-                onClick={onOpen}
-                className="block md:hidden mr-2"
-                variant="ghost"
-                size="sm"
+        <Button
+            onClick={onOpen}
+            className="block md:hidden mr-2"
+            variant="ghost"
+            size="sm"
+        >
+            <Menu className="h-4 w-4"/>
+        </Button>
+        <Sheet open={isOpen} onOpenChange={onClose}>
+            <SheetContent
+                side="left"
+                className="p-2 pt-10"
             >
-                <Menu className="h-4 w-4" />
-            </Button>
-            <Sheet open={isOpen} onOpenChange={onClose}>
-                <SheetContent
-                    side="left"
-                    className="p-2 pt-10"
-                >
-                    <Sidebar
-                        storageKey="t-sidebar-mobile-state"
-                    />
-                </SheetContent>
-            </Sheet>
+                <Sidebar
+                    storageKey="t-sidebar-mobile-state"
+                    organizations={organizations}
+                    currentOrgId={currentOrgId}
+                />
+            </SheetContent>
+        </Sheet>
         </>
     )
-};
+}

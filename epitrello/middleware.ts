@@ -1,35 +1,81 @@
-import { RedirectToSignIn } from '@clerk/nextjs';
-import { clerkMiddleware } from '@clerk/nextjs/server';
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 
-export default clerkMiddleware({
-    publicRoutes: ["/"],
-    afterAuth(auth, req) {
-      if (auth.userId && auth.isPublicRoute) {
-        let path = "/select-org";
+const publicRoutes = ["/", "/sign-in", "/sign-up", "/api/webhook"];
+const authRoutes = ["/sign-in", "/sign-up", "/select-org"];
 
-        if (auth.orgId) {
-          path = `/organization/${auth.orgId}`;
-        }
-        const orgSelection = new URL(path, req.url);
-        return Response.redirect(orgSelection);
-      }
+const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key-change-this-in-production";
+const key = new TextEncoder().encode(SECRET_KEY);
 
-      if (!auth.userId && !auth.isPublicRoute) {
-        return RedirectToSignIn({ returnBackUrl: req.url });
-      }
-
-      if (auth.userId && !auth.orgId && req.nextUrl.pathname != "/select-org") {
-        const orgSelection = new URL("/select-org", req.url);
-        return Response.redirect(orgSelection);
-      }
+async function verifyToken(token: string) {
+  try {
+    const { payload } = await jwtVerify(token, key, {
+      algorithms: ["HS256"],
+    });
+    return payload;
+  } catch (error) {
+    return null;
   }
-});
+}
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Ignorer les fichiers statiques et les routes Next.js internes
+  if (
+    pathname.startsWith("/_next") ||
+    pathname.startsWith("/api") ||
+    pathname.includes(".")
+  ) {
+    return NextResponse.next();
+  }
+
+  // Récupérer le token de session
+  const sessionToken = request.cookies.get("session")?.value;
+  const session = sessionToken ? await verifyToken(sessionToken) : null;
+  const orgId = request.cookies.get("currentOrgId")?.value;
+
+  // Routes publiques (accessible sans connexion)
+  const isPublicRoute = publicRoutes.includes(pathname);
+
+  // 1. Si pas connecté
+  if (!session) {
+    // Autoriser les routes publiques et les pages d'auth
+    if (isPublicRoute || pathname === "/sign-in" || pathname === "/sign-up") {
+      return NextResponse.next();
+    }
+    // Rediriger vers sign-in pour toute autre route
+    return NextResponse.redirect(new URL("/sign-in", request.url));
+  }
+
+  // 2. Si connecté - gérer les redirections
+  
+  // Rediriger depuis sign-in/sign-up vers le dashboard
+  if (pathname === "/sign-in" || pathname === "/sign-up") {
+    const redirectPath = orgId ? `/organization/${orgId}` : "/select-org";
+    return NextResponse.redirect(new URL(redirectPath, request.url));
+  }
+
+  // Autoriser la home même si connecté (pas de redirection)
+  if (pathname === "/") {
+    return NextResponse.next();
+  }
+
+  // Autoriser /select-org pour choisir une organisation
+  if (pathname === "/select-org") {
+    return NextResponse.next();
+  }
+
+  // 3. Si connecté mais pas d'organisation, rediriger vers select-org
+  if (!orgId) {
+    return NextResponse.redirect(new URL("/select-org", request.url));
+  }
+
+  // Laisser passer toutes les autres routes
+  return NextResponse.next();
+}
 
 export const config = {
-  matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
-  ],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

@@ -1,14 +1,210 @@
-generator client {
-  provider = "prisma-client-js"
-}
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
-  relationMode = "prisma"
+  provider               = "postgresql"
+  url                    = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl              = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+generator client {
+  provider               = "prisma-client-js"
 }
 
 model Board {
-  id    String @id @default(cuid())
-  title String
+  id                     String @id @default(uuid())
+  orgId                  String
+  title                  String
+  imageId                String
+  imageThumbUrl          String @db.Text
+  imageFullUrl           String @db.Text
+  imageUserName          String @db.Text
+  imageLinkHTML          String @db.Text
+  customImage            String? @db.Text // Custom uploaded image
+
+  lists                  List[]
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model List {
+  id                     String @id @default(uuid())
+  title                  String
+  order                  Int
+
+  boardId                String 
+  board                  Board @relation(fields: [boardId], references: [id], onDelete: Cascade)
+
+  cards                  Card[]
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([boardId])
+}
+
+model Card {
+  id                     String @id @default(uuid())
+  title                  String
+  order                  Int
+  description            String? @db.Text
+  dueDate                DateTime?
+  isCompleted            Boolean @default(false)
+  coverImage             String? @db.Text
+
+  listId                 String
+  list                   List @relation(fields: [listId], references: [id], onDelete: Cascade)
+
+  assignees              CardAssignee[]
+  labels                 CardLabel[]
+  checklist              ChecklistItem[]
+  attachments            CardAttachment[]
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([listId])
+}
+
+model CardAssignee {
+  id                     String @id @default(uuid())
+  
+  cardId                 String
+  card                   Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+  
+  userId                 String
+  
+  createdAt              DateTime @default(now())
+
+  @@unique([cardId, userId])
+  @@index([cardId])
+  @@index([userId])
+}
+
+model CardLabel {
+  id                     String @id @default(uuid())
+  name                   String
+  color                  String // hex color
+  
+  cardId                 String
+  card                   Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  createdAt              DateTime @default(now())
+
+  @@index([cardId])
+}
+
+model ChecklistItem {
+  id                     String @id @default(uuid())
+  title                  String
+  isCompleted            Boolean @default(false)
+  order                  Int
+  
+  cardId                 String
+  card                   Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([cardId])
+}
+
+model CardAttachment {
+  id                     String @id @default(uuid())
+  name                   String
+  url                    String @db.Text
+  
+  cardId                 String
+  card                   Card @relation(fields: [cardId], references: [id], onDelete: Cascade)
+
+  createdAt              DateTime @default(now())
+
+  @@index([cardId])
+}
+
+enum ACTION {
+  CREATE
+  UPDATE
+  DELETE
+}
+
+enum ENTITY_TYPE {
+  BOARD
+  LIST
+  CARD
+}
+
+model AuditLog {
+  id                     String @id @default(uuid())
+  orgId                  String
+  action                 ACTION
+  entityId               String
+  entityType             ENTITY_TYPE
+  entityTitle            String
+  userId                 String
+  userImage              String @db.Text
+  userName               String @db.Text
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model User {
+  id                     String @id @default(uuid())
+  email                  String @unique
+  password               String
+  name                   String?
+  imageUrl               String? @db.Text
+  customImage            String? @db.Text // Custom uploaded image
+  
+  organizations          OrganizationMember[]
+  sessions               Session[]
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model Organization {
+  id                     String @id @default(uuid())
+  name                   String
+  slug                   String @unique
+  imageUrl               String? @db.Text
+  customImage            String? @db.Text // Custom uploaded image
+  
+  members                OrganizationMember[]
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+}
+
+model OrganizationMember {
+  id                     String @id @default(uuid())
+  role                   String @default("member") // admin, member
+  
+  userId                 String
+  user                   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  organizationId         String
+  organization           Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@unique([userId, organizationId])
+  @@index([userId])
+  @@index([organizationId])
+}
+
+model Session {
+  id                     String @id @default(uuid())
+  sessionToken           String @unique
+  userId                 String
+  user                   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expires                DateTime
+
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([userId])
 }

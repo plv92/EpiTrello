@@ -1,16 +1,19 @@
-import Link from "next/link";
-import localFont from "next/font/local";
-import { Poppins } from "next/font/google";
-import { Button } from "@/components/ui/button";
 import { Medal } from "lucide-react";
+import localFont from "next/font/local";
+import Link from "next/link";
+
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Poppins } from "next/font/google";
+import { cookies } from "next/headers";
+import { auth } from "@/lib/auth";
 
 const headingFont = localFont({
-    src: "../../public/fonts/font.woff2"
+    src:"../../public/fonts/font.woff2"
 });
 
-const TextFont = Poppins({
-    subsets: ["latin"],
+const textFont = Poppins({
+    subsets:["latin"],
     weight: [
         "100",
         "200",
@@ -20,44 +23,53 @@ const TextFont = Poppins({
         "600",
         "700",
         "800",
-        "900"
+        "900",
     ],
-})
+});
 
-const MarketingPage =() => {
+const MarketingPage = async () => {
+    const cookieStore = cookies();
+    const orgId = cookieStore.get("currentOrgId")?.value;
+    const authResult = await auth();
+
     return (
         <div className="flex items-center justify-center flex-col">
             <div className={cn(
                 "flex items-center justify-center flex-col",
                 headingFont.className,
             )}>
-                <div className="mb-4 flax item-center border shadow-sm p-4 bg-amber-100
-                text-amber-700 rounded-full uppercase">
-                    <Medal className="h-6 w-6 mr-2" />
-                    No 1 task Management
+                <div className="mb-4 flex items-center border shadow-sm p-4 bg-purple-100 text-purple-700 rounded-full uppercase">
+                    <Medal className="h-6 w-6 mr-2"/>
+                    No 1 task management
                 </div>
                 <h1 className="text-3xl md:text-6xl text-center text-neutral-800 mb-6">
                     Epitrello helps team move
                 </h1>
-                <div className="text-3xlmd:text-6xl bg-gradient-to-r from-fuchsia-600 to-pink-600
-                text-white px-4 p-2 rounded-md pb-4 w-fit">
+                <div className="text-3xl md:text-6xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white px-4 p-4 rounded-md pb-4 w-fit">
                     work forward.
                 </div>
             </div>
             <div className={cn(
                 "text-sm md:text-xl text-neutral-400 mt-4 max-w-xs md:max-w-2xl text-center mx-auto",
-                TextFont.className,
-                )}>
-                Collaborate, manage projects, and reach new productivity peaks.
-                From high rises to the home office, the way your team works is unique—accomplish it all with Epitrello.
+                textFont.className,
+            )}>
+                Collaborate, manage project and reach new productivity peaks. From high rises to the home office the way your team works is unique - accomplish it all with Epitrello.
             </div>
-            <Button className="mt-6" size="lg" asChild>
-                <Link href="/sign-up">
-                    Get Epitrello for free
-                </Link>
-            </Button>
+            {authResult.isValid && authResult.user ? (
+                <Button className="mt-6" size="lg" asChild>
+                    <Link href={orgId ? `/organization/${orgId}` : "/select-org"}>
+                        Go to Dashboard
+                    </Link>
+                </Button>
+            ) : (
+                <Button className="mt-6" size="lg" asChild>
+                    <Link href="/sign-up">
+                        Get Epitrello for free
+                    </Link>
+                </Button>
+            )}
         </div>
     );
-};
+}
 
 export default MarketingPage;
