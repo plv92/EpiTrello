@@ -36,6 +36,7 @@ export const BoardList = async () => {
                     <Link
                         key={board.id}
                         href={`/board/${board.id}`}
+                        prefetch={true}
                         className="group relative aspect-video bg-no-repeat bg-center bg-cover bg-sky-700 rounded-sm h-full w-full p-2 overflow-hidden"
                         style={{ backgroundImage: `url(${board.imageThumbUrl})` }}
                     >

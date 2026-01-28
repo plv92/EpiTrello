@@ -168,6 +168,7 @@ model User {
 
   comments               Comment[]
   notifications          Notification[]
+  invitations            OrganizationInvitation[]
 
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
@@ -181,6 +182,7 @@ model Organization {
   customImage            String? @db.Text // Custom uploaded image
   
   members                OrganizationMember[]
+  invitations            OrganizationInvitation[]
 
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
@@ -229,7 +231,7 @@ model Comment {
 
 model Notification {
   id                   String @id @default(uuid())
-  type                 String // "card_assigned", "comment_added", "due_date_soon", "card_completed", etc.
+  type                 String // "card_assigned", "comment_added", "organization_invite", etc.
   title                String
   message              String
   isRead               Boolean @default(false)
@@ -239,9 +241,30 @@ model Notification {
   
   cardId               String?
   boardId              String?
+  invitationId         String?
   
   createdAt            DateTime @default(now())
 
   @@index([userId])
   @@index([isRead])
+}
+
+model OrganizationInvitation {
+  id                   String @id @default(uuid())
+  status               String @default("pending") // "pending", "accepted", "declined"
+  
+  userId               String
+  user                 User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  organizationId       String
+  organization         Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  
+  invitedBy            String
+  
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+
+  @@unique([userId, organizationId])
+  @@index([userId])
+  @@index([organizationId])
 }

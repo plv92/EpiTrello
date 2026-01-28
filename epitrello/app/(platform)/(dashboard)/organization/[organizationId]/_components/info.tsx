@@ -33,22 +33,23 @@ export const Info = async () => {
 
     return (
         <div className="flex items-center gap-x-4">
-            <div className="w-[60px] h-[60px] relative">
+            <div className="w-[60px] h-[60px] relative flex-shrink-0">
                 {organization.imageUrl ? (
                     <Image 
                         fill
                         src={organization.imageUrl}
                         alt="Organization"
                         className="rounded-md object-cover"
+                        sizes="60px"
                     />
                 ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-blue-600 text-white font-bold text-2xl rounded-md">
+                    <div className="w-[60px] h-[60px] flex items-center justify-center bg-blue-600 text-white font-bold text-2xl rounded-md">
                         {organization.name.charAt(0).toUpperCase()}
                     </div>
                 )}
             </div>
-            <div className="space-y-1">
-                <p className="font-semibold text-xl">
+            <div className="space-y-1 flex-1 min-w-0">
+                <p className="font-semibold text-xl truncate">
                     {organization.name}
                 </p>
             </div>

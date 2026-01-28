@@ -34,6 +34,11 @@ const OrganizationLayout = async ({
 
     const orgs = organizations.map((om) => om.organization);
 
+    // Si aucune organisation, rediriger vers select-org
+    if (orgs.length === 0) {
+        redirect("/select-org");
+    }
+
     // Vérifier que l'orgId dans les cookies existe vraiment
     if (orgId && !orgs.some(org => org.id === orgId)) {
         // L'organisation n'existe plus - rediriger vers select-org
@@ -46,7 +51,9 @@ const OrganizationLayout = async ({
                 <div className="w-64 shrink-0 hidden md:block">
                     <Sidebar organizations={orgs} currentOrgId={orgId || undefined} />
                 </div>
-                {children}
+                <div className="flex-1 min-w-0">
+                    {children}
+                </div>
             </div>
         </main>
     )

@@ -1,7 +1,8 @@
 "use client";
 
-import { useRouter, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import {
     Activity,
     Layout,
@@ -33,7 +34,6 @@ export const NavItem = ({
     organization,
     onExpand,
 }: NavItemProps) => {
-    const router = useRouter();
     const pathname = usePathname();
 
     const routes = [
@@ -53,10 +53,6 @@ export const NavItem = ({
             href: `/organization/${organization.id}/settings`,
         },
     ];
-
-    const onClick = (href: string) => {
-        router.push(href);
-    };
 
     return (
         <AccordionItem
@@ -89,15 +85,17 @@ export const NavItem = ({
                     <Button
                         key={route.href}
                         size="sm"
-                        onClick={() => onClick(route.href)}
+                        asChild
                         className={cn(
                             "w-full font-normal justify-start pl-10 mb-1",
                             pathname === route.href && "bg-sky-500/10 text-sky-700"
                         )}
                         variant="ghost"
                     >
-                        {route.icon}
-                        {route.label}
+                        <Link href={route.href}>
+                            {route.icon}
+                            {route.label}
+                        </Link>
                     </Button>
                 ))}
             </AccordionContent>

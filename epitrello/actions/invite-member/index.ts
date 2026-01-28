@@ -4,6 +4,7 @@ import { z } from "zod";
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { revalidatePath } from "next/cache";
+import { createNotification } from "@/actions/create-notification";
 
 const InviteMemberSchema = z.object({
   organizationId: z.string(),
@@ -45,6 +46,15 @@ export async function inviteMemberToOrganization(formData: FormData) {
       };
     }
 
+    // Récupérer l'organisation
+    const organization = await db.organization.findUnique({
+      where: { id: organizationId },
+    });
+
+    if (!organization) {
+      return { error: "Organisation non trouvée" };
+    }
+
     // Vérifier si l'utilisateur à inviter existe
     const userToInvite = await db.user.findUnique({
       where: { email },
@@ -70,13 +80,37 @@ export async function inviteMemberToOrganization(formData: FormData) {
       };
     }
 
-    // Ajouter l'utilisateur à l'organisation
-    await db.organizationMember.create({
+    // Vérifier s'il y a déjà une invitation en attente
+    const existingInvitation = await db.organizationInvitation.findFirst({
+      where: {
+        organizationId,
+        userId: userToInvite.id,
+        status: "pending",
+      },
+    });
+
+    if (existingInvitation) {
+      return {
+        error: "Une invitation est déjà en attente pour cet utilisateur",
+      };
+    }
+
+    // Créer l'invitation
+    const invitation = await db.organizationInvitation.create({
       data: {
         organizationId,
         userId: userToInvite.id,
-        role: "member",
+        invitedBy: userId,
       },
+    });
+
+    // Créer une notification pour l'utilisateur invité
+    await createNotification({
+      userId: userToInvite.id,
+      type: "organization_invite",
+      title: "Nouvelle invitation",
+      message: `Vous avez été invité à rejoindre l'organisation "${organization.name}"`,
+      invitationId: invitation.id,
     });
 
     revalidatePath(`/organization/${organizationId}/settings`);

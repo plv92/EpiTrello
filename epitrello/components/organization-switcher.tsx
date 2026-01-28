@@ -32,30 +32,26 @@ export function OrganizationSwitcher({
 }: OrganizationSwitcherProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
-  const [isLoading, setIsLoading] = useState(false);
   const currentOrg = organizations.find((org) => org.id === currentOrganizationId);
 
   const handleOrgChange = async (orgId: string) => {
     if (orgId === currentOrganizationId) return;
     
-    setIsLoading(true);
-    
-    try {
-      // Définir l'organisation actuelle via une action serveur
-      await fetch("/api/set-organization", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ organizationId: orgId }),
-      });
-
-      startTransition(() => {
+    startTransition(async () => {
+      try {
+        // Navigation immédiate pour une meilleure UX
         router.push(`/organization/${orgId}`);
-      });
-    } catch (error) {
-      console.error("Error switching organization:", error);
-    } finally {
-      setIsLoading(false);
-    }
+        
+        // Définir l'organisation en arrière-plan
+        fetch("/api/set-organization", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ organizationId: orgId }),
+        }).catch(console.error);
+      } catch (error) {
+        console.error("Error switching organization:", error);
+      }
+    });
   };
 
   if (!currentOrg) {
@@ -71,10 +67,10 @@ export function OrganizationSwitcher({
           variant="outline"
           role="combobox"
           className="w-full justify-between"
-          disabled={isLoading || isPending}
+          disabled={isPending}
         >
           <div className="flex items-center gap-x-2">
-            {(isLoading || isPending) ? (
+            {isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (
               <Avatar className="h-7 w-7">

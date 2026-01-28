@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Bell, Check, CheckCheck } from "lucide-react";
+import { Bell, Check, CheckCheck, X } from "lucide-react";
 import { fetcher } from "@/lib/fetcher";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,6 +13,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import { markNotificationRead, markAllNotificationsRead } from "@/actions/mark-notification-read";
+import { acceptInvitation, declineInvitation } from "@/actions/manage-invitation";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { fr } from "date-fns/locale";
@@ -26,6 +27,7 @@ interface Notification {
   isRead: boolean;
   cardId: string | null;
   boardId: string | null;
+  invitationId: string | null;
   createdAt: string;
 }
 
@@ -53,6 +55,11 @@ export const NotificationBell = () => {
   };
 
   const handleNotificationClick = (notification: Notification) => {
+    // Ne pas naviguer si c'est une invitation (elle a des boutons d'action)
+    if (notification.type === "organization_invite") {
+      return;
+    }
+
     if (!notification.isRead) {
       handleMarkAsRead(notification.id);
     }
@@ -61,6 +68,58 @@ export const NotificationBell = () => {
     if (notification.cardId && notification.boardId) {
       setIsOpen(false);
       router.push(`/board/${notification.boardId}`);
+    }
+  };
+
+  const handleAcceptInvitation = async (invitationId: string) => {
+    try {
+      // Optimistic update - fermer la popover immédiatement
+      setIsOpen(false);
+      toast.loading("Acceptation de l'invitation...");
+      
+      const result = await acceptInvitation(invitationId);
+      
+      toast.dismiss();
+      
+      if (result.error) {
+        toast.error(result.error);
+        refetch();
+        return;
+      }
+      
+      toast.success("Invitation acceptée !");
+      
+      if (result.organizationId) {
+        // Navigation immédiate
+        router.push(`/organization/${result.organizationId}`);
+      }
+      
+      refetch();
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Une erreur est survenue");
+      refetch();
+    }
+  };
+
+  const handleDeclineInvitation = async (invitationId: string) => {
+    try {
+      toast.loading("Refus de l'invitation...");
+      
+      const result = await declineInvitation(invitationId);
+      
+      toast.dismiss();
+      
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      
+      toast.success("Invitation refusée");
+      refetch();
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Une erreur est survenue");
     }
   };
 
@@ -102,9 +161,9 @@ export const NotificationBell = () => {
               {notifications.map((notification) => (
                 <div
                   key={notification.id}
-                  className={`p-4 hover:bg-accent cursor-pointer transition-colors ${
+                  className={`p-4 transition-colors ${
                     !notification.isRead ? "bg-blue-50" : ""
-                  }`}
+                  } ${notification.type !== "organization_invite" ? "hover:bg-accent cursor-pointer" : ""}`}
                   onClick={() => handleNotificationClick(notification)}
                 >
                   <div className="flex items-start gap-2">
@@ -126,8 +185,31 @@ export const NotificationBell = () => {
                           locale: fr,
                         })}
                       </p>
+                      
+                      {/* Boutons d'action pour les invitations */}
+                      {notification.type === "organization_invite" && notification.invitationId && (
+                        <div className="flex gap-2 mt-2" onClick={(e) => e.stopPropagation()}>
+                          <Button
+                            size="sm"
+                            onClick={() => handleAcceptInvitation(notification.invitationId!)}
+                            className="flex-1"
+                          >
+                            <Check className="h-4 w-4 mr-1" />
+                            Accepter
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDeclineInvitation(notification.invitationId!)}
+                            className="flex-1"
+                          >
+                            <X className="h-4 w-4 mr-1" />
+                            Refuser
+                          </Button>
+                        </div>
+                      )}
                     </div>
-                    {!notification.isRead && (
+                    {!notification.isRead && notification.type !== "organization_invite" && (
                       <Button
                         variant="ghost"
                         size="sm"

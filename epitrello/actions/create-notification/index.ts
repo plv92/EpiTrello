@@ -9,6 +9,7 @@ interface CreateNotificationParams {
   message: string;
   cardId?: string;
   boardId?: string;
+  invitationId?: string;
 }
 
 export async function createNotification({
@@ -18,6 +19,7 @@ export async function createNotification({
   message,
   cardId,
   boardId,
+  invitationId,
 }: CreateNotificationParams) {
   try {
     await db.notification.create({
@@ -28,6 +30,7 @@ export async function createNotification({
         message,
         cardId,
         boardId,
+        invitationId,
       },
     });
     return { success: true };
