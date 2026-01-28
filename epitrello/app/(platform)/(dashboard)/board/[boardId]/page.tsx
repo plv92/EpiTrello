@@ -26,6 +26,10 @@ const BoardIdPage = async ({
                 orderBy: {
                     order: "asc",
                 },
+                include: {
+                    labels: true,
+                    assignees: true,
+                },
             },
         },
         orderBy: {

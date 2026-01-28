@@ -62,7 +62,7 @@ export const CardModal = () => {
                                 </>
                             ) : (
                                 <>
-                                    <Assignees data={cardData} members={membersData} />
+                                    <Assignees data={cardData} members={membersData ?? []} />
                                     <Labels data={cardData} />
                                     <DueDate data={cardData} />
                                 </>

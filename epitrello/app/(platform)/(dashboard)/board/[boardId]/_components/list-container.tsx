@@ -4,8 +4,11 @@ import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import { useAction } from "@/hooks/use-actions";
 import { updateListOrder } from "@/actions/update-list-order";
 import { ListWithCards } from "@/types";
+import { CardLabel, CardAssignee } from "@prisma/client";
 import { ListForm } from "./list-form";
 import { useEffect, useState } from "react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { ListItem } from "./list-item";
 import { toast } from "sonner";
 import { updateCardOrder } from "@/actions/update-card-order";
@@ -28,6 +31,10 @@ export const ListContainer = ({
     boardId,
 }: ListContainerProps) => {
     const [orderedData, setOrderedData] = useState(data);
+    const [search, setSearch] = useState("");
+    // Filtres avancés
+    const [selectedLabel, setSelectedLabel] = useState<string>("");
+    const [selectedAssignee, setSelectedAssignee] = useState<string>("");
 
     const { execute: executeUpdateListOrder} = useAction(updateListOrder, {
         onSuccess: () => {
@@ -145,30 +152,102 @@ export const ListContainer = ({
         }
     }
 
+    // Extraction des labels et assignees uniques pour les filtres
+    const allLabels: CardLabel[] = [];
+    const allAssignees: CardAssignee[] = [];
+    orderedData.forEach(list => {
+        list.cards.forEach(card => {
+            if (Array.isArray(card.labels)) {
+                card.labels.forEach(label => {
+                    if (!allLabels.find(l => l.id === label.id)) allLabels.push(label);
+                });
+            }
+            if (Array.isArray(card.assignees)) {
+                card.assignees.forEach(assignee => {
+                    if (!allAssignees.find(a => a.id === assignee.id)) allAssignees.push(assignee);
+                });
+            }
+        });
+    });
+
+    // Filtrage combiné
+    const filteredData = orderedData.map(list => ({
+        ...list,
+        cards: list.cards.filter(card => {
+            // Recherche texte
+            let match = true;
+            if (search.trim()) {
+                const s = search.trim().toLowerCase();
+                match = card.title.toLowerCase().includes(s) || (card.description?.toLowerCase().includes(s) ?? false);
+            }
+            // Filtre label
+            if (selectedLabel) {
+                match = match && Array.isArray(card.labels) && card.labels.some(l => l.id === selectedLabel);
+            }
+            // Filtre assignee
+            if (selectedAssignee) {
+                match = match && Array.isArray(card.assignees) && card.assignees.some(a => a.id === selectedAssignee);
+            }
+            return match;
+        })
+    }));
+
     return (
-        <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="lists" type="list" direction="horizontal">
-                {(provided) => (
-                    <ol
-                        {...provided.droppableProps}
-                        ref={provided.innerRef}
-                        className="flex gap-x-3 h-full"
-                    >
-                        {orderedData.map((list, index) => {
-                            return (
-                                <ListItem
-                                    key={list.id}
-                                    index={index}
-                                    data={list}
-                                />
-                            )
-                        })}
-                        {provided.placeholder}
-                        <ListForm />
-                        <div className="flex shrink-0 w-1"/>
-                    </ol>
-                )}
-            </Droppable>
-        </DragDropContext>
+        <div className="mb-4">
+            <div className="flex flex-wrap gap-2 items-center mb-4">
+                <Input
+                    type="text"
+                    placeholder="Rechercher une carte..."
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                    className="w-64"
+                />
+                <select
+                    className="border rounded px-2 py-1"
+                    value={selectedLabel}
+                    onChange={e => setSelectedLabel(e.target.value)}
+                >
+                    <option value="">Tous les labels</option>
+                    {allLabels.map(label => (
+                        <option key={label.id} value={label.id}>{label.name}</option>
+                    ))}
+                </select>
+                <select
+                    className="border rounded px-2 py-1"
+                    value={selectedAssignee}
+                    onChange={e => setSelectedAssignee(e.target.value)}
+                >
+                    <option value="">Tous les assignés</option>
+                    {allAssignees.map(assignee => (
+                        <option key={assignee.id} value={assignee.id}>{assignee.name || assignee.email}</option>
+                    ))}
+                </select>
+                {/* TODO: Ajouter un filtre par date si besoin */}
+            </div>
+            <DragDropContext onDragEnd={onDragEnd}>
+                <Droppable droppableId="lists" type="list" direction="horizontal">
+                    {(provided) => (
+                        <ol
+                            {...provided.droppableProps}
+                            ref={provided.innerRef}
+                            className="flex gap-x-3 h-full"
+                        >
+                            {filteredData.map((list, index) => {
+                                return (
+                                    <ListItem
+                                        key={list.id}
+                                        index={index}
+                                        data={list}
+                                    />
+                                )
+                            })}
+                            {provided.placeholder}
+                            <ListForm />
+                            <div className="flex shrink-0 w-1"/>
+                        </ol>
+                    )}
+                </Droppable>
+            </DragDropContext>
+        </div>
     )
 }
