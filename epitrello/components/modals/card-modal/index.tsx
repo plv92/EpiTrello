@@ -15,7 +15,9 @@ import { Assignees } from "./assignees";
 import { Labels } from "./labels";
 import { DueDate } from "./due-date";
 import { Checklist } from "./checklist";
+
 import { Separator } from "@/components/ui/separator";
+import { Comments } from "./comments";
 
 export const CardModal = () => {
     const id = useCardModal((state) => state.id);
@@ -47,13 +49,12 @@ export const CardModal = () => {
             onOpenChange={onClose}
         >
             <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-                {!cardData ? <Header.Skeleton /> :
-                    <Header data={cardData}/>
-                }   
+                {!cardData ? <Header.Skeleton /> : <Header data={cardData} />}
+
                 <div className="grid grid-cols-1 md:grid-cols-4 md:gap-4">
                     <div className="col-span-3">
                         <div className="w-full space-y-6">
-                            {!cardData || !membersData ? (
+                            {!cardData ? (
                                 <>
                                     <Assignees.Skeleton />
                                     <Labels.Skeleton />
@@ -66,31 +67,25 @@ export const CardModal = () => {
                                     <DueDate data={cardData} />
                                 </>
                             )}
-                            
+
                             <Separator />
-                            
-                            {!cardData ?
-                                <Description.Skeleton />
-                                : <Description data={cardData} />
-                            }
-                            
-                            {!cardData ?
-                                <Checklist.Skeleton />
-                                : <Checklist data={cardData} />
-                            }
-                            
+
+                            {!cardData ? <Description.Skeleton /> : <Description data={cardData} />}
+
+                            {!cardData ? <Checklist.Skeleton /> : <Checklist data={cardData} />}
+
                             <Separator />
-                            
-                            {!auditLogData ?
-                                <Activity.Skeleton />
-                                : <Activity items={auditLogData} />
-                            }
+
+                            {/* Section Commentaires */}
+                            {cardData && <Comments cardId={cardData.id} />}
+
+                            <Separator />
+
+                            {!auditLogData ? <Activity.Skeleton /> : <Activity items={auditLogData} />}
                         </div>
                     </div>
-                    {!cardData
-                        ? <Actions.Skeleton />
-                        : <Actions data={cardData} /> 
-                    }
+
+                    {!cardData ? <Actions.Skeleton /> : <Actions data={cardData} />}
                 </div>
             </DialogContent>
         </Dialog>
