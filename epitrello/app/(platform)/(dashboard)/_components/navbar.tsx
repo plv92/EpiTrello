@@ -8,6 +8,7 @@ import { OrganizationSwitcher } from "@/components/organization-switcher";
 import { FormPopover } from "@/components/form/form-popover";
 import { getCurrentUser, auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { NotificationBell } from "@/components/notification-bell";
 
 import { MobileSidebar } from "./mobile-sidebar";
 
@@ -48,6 +49,7 @@ export const Navbar = async () => {
                 </FormPopover>
             </div>
             <div className="ml-auto flex items-center gap-x-2">
+                <NotificationBell />
                 <OrganizationSwitcher 
                     organizations={orgs}
                     currentOrganizationId={orgId || undefined}

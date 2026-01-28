@@ -167,6 +167,7 @@ model User {
   sessions               Session[]
 
   comments               Comment[]
+  notifications          Notification[]
 
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
@@ -224,4 +225,23 @@ model Comment {
   cardId               String
   user                User @relation(fields: [userId], references: [id])
   userId              String
+}
+
+model Notification {
+  id                   String @id @default(uuid())
+  type                 String // "card_assigned", "comment_added", "due_date_soon", "card_completed", etc.
+  title                String
+  message              String
+  isRead               Boolean @default(false)
+  
+  userId               String
+  user                 User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  cardId               String?
+  boardId              String?
+  
+  createdAt            DateTime @default(now())
+
+  @@index([userId])
+  @@index([isRead])
 }

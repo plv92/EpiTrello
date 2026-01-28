@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { db } from "@/lib/db";
 import { createSafeAction } from "@/lib/create-safe-actions";
 import { auth } from "@/lib/auth";
+import { createNotification } from "@/actions/create-notification";
 
 import { AddCardAssignee } from "./schema";
 import { InputType, ReturnType } from "./types";
@@ -76,6 +77,18 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         userId,
       },
     });
+
+    // Créer une notification pour l'utilisateur assigné (sauf si c'est lui-même qui s'assigne)
+    if (userId !== currentUserId) {
+      await createNotification({
+        userId,
+        type: "card_assigned",
+        title: "Nouvelle assignation",
+        message: `Vous avez été assigné à la carte "${card.title}"`,
+        cardId,
+        boardId: card.list.boardId,
+      });
+    }
 
     revalidatePath(`/board/${card.list.boardId}`);
     return { data: assignee };
