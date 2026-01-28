@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Trash2, Edit2, Save, X } from "lucide-react";
@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ImageUpload } from "@/components/image-upload";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,22 +23,34 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { deleteOrganization } from "@/actions/delete-organization";
+import { updateOrganization } from "@/actions/update-organization";
 
 interface OrganizationSettingsProps {
   organization?: {
     id: string;
     name: string;
     imageUrl: string | null;
+    customImage?: string | null;
   };
 }
 
 export const OrganizationSettings = ({ organization }: OrganizationSettingsProps) => {
   const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [isEditing, setIsEditing] = useState(false);
   const [name, setName] = useState(organization?.name || "");
   const [isLoading, setIsLoading] = useState(false);
 
+  const initials = organization?.name
+    ?.split(" ")
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase()
+    .slice(0, 2) || "OR";
+
   const handleSave = async () => {
+    if (!organization) return;
+    
     if (!name.trim()) {
       toast.error("Le nom ne peut pas être vide");
       return;
@@ -44,10 +58,18 @@ export const OrganizationSettings = ({ organization }: OrganizationSettingsProps
 
     setIsLoading(true);
     try {
-      // TODO: Implement update organization API
-      toast.success("Organisation mise à jour");
-      setIsEditing(false);
-      router.refresh();
+      const result = await updateOrganization({
+        organizationId: organization.id,
+        name,
+      });
+
+      if (result.error) {
+        toast.error(result.error);
+      } else {
+        toast.success("Organisation mise à jour");
+        setIsEditing(false);
+        router.refresh();
+      }
     } catch (error) {
       toast.error("Erreur lors de la mise à jour");
     } finally {
@@ -97,6 +119,61 @@ export const OrganizationSettings = ({ organization }: OrganizationSettingsProps
 
   return (
     <div className="space-y-6">
+      {/* Image de l'organisation */}
+      <Card className="transition-all duration-200 hover:shadow-md">
+        <CardHeader>
+          <CardTitle>Image de l'organisation</CardTitle>
+          <CardDescription>
+            Uploadez votre propre logo ou utilisez l'avatar généré
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col md:flex-row items-start gap-6">
+            <div className="flex flex-col items-center gap-3">
+              <Avatar className="h-24 w-24 border-4 border-primary/10">
+                <AvatarImage 
+                  src={organization.customImage || organization.imageUrl || undefined} 
+                  alt={organization.name} 
+                />
+                <AvatarFallback className="text-3xl bg-gradient-to-br from-sky-500 to-indigo-500 text-white">
+                  {initials}
+                </AvatarFallback>
+              </Avatar>
+              {organization.customImage && (
+                <p className="text-xs text-green-600 font-medium">Image personnalisée</p>
+              )}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm text-muted-foreground mb-4">
+                {organization.customImage 
+                  ? "Vous utilisez une image personnalisée. Vous pouvez la remplacer ou revenir à l'avatar automatique."
+                  : "Uploadez votre propre logo pour personnaliser votre organisation."}
+              </p>
+              <ImageUpload
+                value={organization.customImage || ""}
+                onChange={(url) => {
+                  startTransition(async () => {
+                    const result = await updateOrganization({
+                      organizationId: organization.id,
+                      customImage: url,
+                    });
+                    if (result.error) {
+                      toast.error(result.error);
+                    } else {
+                      toast.success("Logo mis à jour!");
+                      router.refresh();
+                    }
+                  });
+                }}
+                disabled={isPending}
+                aspectRatio="square"
+                className="max-w-[200px]"
+              />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Informations générales */}
       <Card className="transition-all duration-200 hover:shadow-md">
         <CardHeader>

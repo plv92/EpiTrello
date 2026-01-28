@@ -21,6 +21,7 @@ interface ProfileFormProps {
 export function ProfileForm({ user }: ProfileFormProps) {
   const [isPending, startTransition] = useTransition();
   const [name, setName] = useState(user.name || "");
+  const [username, setUsername] = useState(user.username || "");
   const [email, setEmail] = useState(user.email);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -46,6 +47,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
     startTransition(async () => {
       const result = await updateProfile({
         name,
+        username,
         email,
         currentPassword: isEditingPassword ? currentPassword : undefined,
         newPassword: isEditingPassword ? newPassword : undefined,
@@ -99,6 +101,7 @@ export function ProfileForm({ user }: ProfileFormProps) {
                   startTransition(async () => {
                     const result = await updateProfile({
                       name,
+                      username,
                       email,
                       customImage: url,
                     });
@@ -140,6 +143,25 @@ export function ProfileForm({ user }: ProfileFormProps) {
               className="transition-all duration-150 focus:ring-2 focus:ring-primary/20"
               required
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="username" className="flex items-center gap-2">
+              <UserIcon className="h-4 w-4 text-muted-foreground" />
+              Pseudo
+            </Label>
+            <Input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="votre-pseudo"
+              disabled={isPending}
+              className="transition-all duration-150 focus:ring-2 focus:ring-primary/20"
+            />
+            <p className="text-xs text-muted-foreground">
+              Optionnel - Ce pseudo sera visible par les autres utilisateurs
+            </p>
           </div>
 
           <div className="space-y-2">

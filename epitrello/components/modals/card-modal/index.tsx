@@ -15,6 +15,7 @@ import { Assignees } from "./assignees";
 import { Labels } from "./labels";
 import { DueDate } from "./due-date";
 import { Checklist } from "./checklist";
+import { Cover } from "./cover";
 
 import { Separator } from "@/components/ui/separator";
 import { Comments } from "./comments";
@@ -56,12 +57,14 @@ export const CardModal = () => {
                         <div className="w-full space-y-6">
                             {!cardData ? (
                                 <>
+                                    <Cover.Skeleton />
                                     <Assignees.Skeleton />
                                     <Labels.Skeleton />
                                     <DueDate.Skeleton />
                                 </>
                             ) : (
                                 <>
+                                    <Cover data={cardData} />
                                     <Assignees data={cardData} members={membersData ?? []} />
                                     <Labels data={cardData} />
                                     <DueDate data={cardData} />

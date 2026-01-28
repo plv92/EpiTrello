@@ -19,7 +19,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     };
   }
 
-  const { name, email, customImage, currentPassword, newPassword } = data;
+  const { name, username, email, customImage, currentPassword, newPassword } = data;
 
   try {
     // Vérifier si l'email est déjà utilisé par un autre utilisateur
@@ -31,6 +31,19 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       return {
         error: "Cet email est déjà utilisé",
       };
+    }
+
+    // Vérifier si le username est déjà utilisé
+    if (username) {
+      const existingUsername = await db.user.findUnique({
+        where: { username },
+      });
+
+      if (existingUsername && existingUsername.id !== userId) {
+        return {
+          error: "Ce pseudo est déjà utilisé",
+        };
+      }
     }
 
     // Si changement de mot de passe, vérifier le mot de passe actuel
@@ -60,6 +73,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         where: { id: userId },
         data: {
           name,
+          username,
           email,
           customImage,
           password: hashedPassword,
@@ -75,6 +89,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
       where: { id: userId },
       data: {
         name,
+        username,
         email,
         customImage,
       },

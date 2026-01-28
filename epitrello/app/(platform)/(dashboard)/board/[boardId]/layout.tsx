@@ -55,10 +55,13 @@ const BoardIdLayout = async ({
         notFound();
     }
 
+    // Prioriser l'image personnalisée si elle existe
+    const backgroundImage = board.customImage || board.imageFullUrl;
+
     return (
         <div
             className="relative h-full bg-no-repeat bg-cover bg-center"
-            style={{ backgroundImage: `url(${board.imageFullUrl})` }}
+            style={{ backgroundImage: `url(${backgroundImage})` }}
         >
             <BoardOrgSync orgId={board.orgId} />
             <BoardNavbar data={board} orgId={board.orgId} />

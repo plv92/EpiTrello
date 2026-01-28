@@ -20,18 +20,57 @@ const handler = async (data: InputType): Promise<ReturnType> => {
         };
     }
 
-    const { title, id } = data;
+    const { title, id, image } = data;
     let board;
 
     try {
+        // Préparer les données à mettre à jour
+        const updateData: {
+            title?: string;
+            imageId?: string;
+            imageThumbUrl?: string;
+            imageFullUrl?: string;
+            imageLinkHTML?: string;
+            imageUserName?: string;
+            customImage?: string | null;
+        } = {};
+
+        if (title !== undefined) {
+            updateData.title = title;
+        }
+
+        if (image !== undefined) {
+            // Vérifier si c'est une image personnalisée uploadée
+            if (image.startsWith("/uploads/") || (image.startsWith("http") && image.includes("/uploads/"))) {
+                // C'est une image personnalisée
+                updateData.customImage = image;
+                updateData.imageId = "custom";
+                updateData.imageThumbUrl = image;
+                updateData.imageFullUrl = image;
+                updateData.imageLinkHTML = "";
+                updateData.imageUserName = "Custom Upload";
+            } else {
+                // C'est une image Unsplash
+                const imageParts = image.split("|");
+                
+                if (imageParts.length === 5) {
+                    const [imageId, imageThumbUrl, imageFullUrl, imageLinkHTML, imageUserName] = imageParts;
+                    updateData.imageId = imageId;
+                    updateData.imageThumbUrl = imageThumbUrl;
+                    updateData.imageFullUrl = imageFullUrl;
+                    updateData.imageLinkHTML = imageLinkHTML;
+                    updateData.imageUserName = imageUserName;
+                    updateData.customImage = null;
+                }
+            }
+        }
+
         board = await db.board.update({
             where: {
                 id,
                 orgId,
             },
-            data: {
-                title,
-            },
+            data: updateData,
         });
 
         await createAuditLog({

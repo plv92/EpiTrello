@@ -24,9 +24,20 @@ export const CardItem = ({
                     ref={provided.innerRef}
                     role="button"
                     onClick={() => cardModal.onOpen(data.id)}
-                    className="truncate border-2 border-transparent hover:border-black py-2 px-3 text-sm bg-white rounded-md shadow-sm"
+                    className="truncate border-2 border-transparent hover:border-black bg-white rounded-md shadow-sm overflow-hidden"
                 >
-                    {data.title}
+                    {data.coverImage && (
+                        <div className="w-full h-24 relative">
+                            <img
+                                src={data.coverImage}
+                                alt="Cover"
+                                className="w-full h-full object-cover"
+                            />
+                        </div>
+                    )}
+                    <div className="py-2 px-3 text-sm">
+                        {data.title}
+                    </div>
                 </div>
             )}
         </Draggable>
