@@ -1,24 +1,17 @@
 import { FormPopover } from "@/components/form/form-popover";
 import { db } from "@/lib/db";
 import { User2 } from "lucide-react"
-import { auth } from "@/lib/auth";
 import Link from "next/link";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export const BoardList = async () => {
-    const { orgId } = await auth();
+interface BoardListProps {
+    organizationId: string;
+}
 
-    if (!orgId) {
-        return (
-            <div className="text-sm text-muted-foreground">
-                No organization selected. Please select an organization.
-            </div>
-        );
-    }
-
+export const BoardList = async ({ organizationId }: BoardListProps) => {
     const boards = await db.board.findMany({
         where: {
-            orgId,
+            orgId: organizationId,
         },
         orderBy: {
             createdAt: "desc"

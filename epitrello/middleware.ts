@@ -34,7 +34,7 @@ export async function middleware(request: NextRequest) {
   // Récupérer le token de session
   const sessionToken = request.cookies.get("session")?.value;
   const session = sessionToken ? await verifyToken(sessionToken) : null;
-  const orgId = request.cookies.get("currentOrgId")?.value;
+  let orgId = request.cookies.get("currentOrgId")?.value;
 
   // Routes publiques (accessible sans connexion)
   const isPublicRoute = publicRoutes.includes(pathname);
@@ -64,6 +64,28 @@ export async function middleware(request: NextRequest) {
 
   // Autoriser /select-org pour choisir une organisation
   if (pathname === "/select-org") {
+    return NextResponse.next();
+  }
+
+  // Détecter si on est sur une page d'organisation et mettre à jour le cookie
+  const orgMatch = pathname.match(/^\/organization\/([^/]+)/);
+  if (orgMatch) {
+    const newOrgId = orgMatch[1];
+    const response = NextResponse.next();
+    response.cookies.set("currentOrgId", newOrgId, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
+    return response;
+  }
+
+  // Détecter si on est sur un board et mettre à jour le cookie avec l'org du board
+  const boardMatch = pathname.match(/^\/board\/([^/]+)/);
+  if (boardMatch) {
+    // On ne peut pas faire de requête DB ici, donc on utilise une approche différente
+    // Le cookie sera mis à jour via l'API set-organization appelée par le client
     return NextResponse.next();
   }
 

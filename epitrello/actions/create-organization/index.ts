@@ -10,15 +10,18 @@ const CreateOrganizationSchema = z.object({
   name: z.string().min(3, "Le nom doit contenir au moins 3 caractères"),
 });
 
-export async function createOrganization(formData: FormData) {
+export async function createOrganization(data: FormData | { name: string }) {
   const { userId } = await auth();
 
   if (!userId) {
     return { error: "Non authentifié" };
   }
 
+  // Extraire le nom selon le type de données
+  const name = data instanceof FormData ? data.get("name") : data.name;
+
   const validatedFields = CreateOrganizationSchema.safeParse({
-    name: formData.get("name"),
+    name,
   });
 
   if (!validatedFields.success) {
@@ -26,8 +29,6 @@ export async function createOrganization(formData: FormData) {
       error: "Champs invalides",
     };
   }
-
-  const { name } = validatedFields.data;
 
   // Vérifier si l'utilisateur a déjà créé une organisation avec ce nom
   const existingUserOrg = await db.organizationMember.findFirst({
@@ -90,5 +91,11 @@ export async function createOrganization(formData: FormData) {
   });
 
   revalidatePath("/select-org");
-  redirect(`/organization/${organization.id}`);
+  
+  return {
+    data: {
+      id: organization.id,
+      name: organization.name,
+    }
+  };
 }

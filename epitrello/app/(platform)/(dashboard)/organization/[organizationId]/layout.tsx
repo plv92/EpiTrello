@@ -1,18 +1,16 @@
 import { startCase } from "lodash";
-import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 
-export async function generateMetadata() {
-    const { orgId } = await auth();
+interface OrganizationIdLayoutProps {
+    children: React.ReactNode;
+    params: {
+        organizationId: string;
+    };
+}
 
-    if (!orgId) {
-        return {
-            title: "Organization",
-        };
-    }
-
+export async function generateMetadata({ params }: { params: { organizationId: string } }) {
     const organization = await db.organization.findUnique({
-        where: { id: orgId },
+        where: { id: params.organizationId },
     });
 
     return {
@@ -20,11 +18,9 @@ export async function generateMetadata() {
     };
 }
 
-const OrganizationIdLayout = ({
-    children
-}: {
-    children: React.ReactNode
-}) => {
+const OrganizationIdLayout = async ({
+    children,
+}: OrganizationIdLayoutProps) => {
     return <>{children}</>;
 };
 

@@ -38,7 +38,9 @@ export const NotificationBell = () => {
   const { data: notifications, refetch } = useQuery<Notification[]>({
     queryKey: ["notifications"],
     queryFn: () => fetcher("/api/notifications"),
-    refetchInterval: 30000, // Rafraîchir toutes les 30 secondes
+    refetchInterval: 10000, // Rafraîchir toutes les 10 secondes
+    refetchOnWindowFocus: true, // Rafraîchir quand la fenêtre reprend le focus
+    refetchOnMount: true, // Rafraîchir au montage du composant
   });
 
   const unreadCount = notifications?.filter((n) => !n.isRead).length || 0;

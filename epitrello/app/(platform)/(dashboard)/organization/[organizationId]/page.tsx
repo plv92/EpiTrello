@@ -3,14 +3,20 @@ import { Info } from "./_components/info";
 import { BoardList } from "./_components/board-list";
 import { Suspense } from "react";
 
-const OrganizationIdPage = async () => {
+interface OrganizationIdPageProps {
+    params: {
+        organizationId: string;
+    };
+}
+
+const OrganizationIdPage = async ({ params }: OrganizationIdPageProps) => {
     return (
         <div className="flex-1 w-full mb-20">
             <Info />
             <Separator className="my-4"/>
             <div className="px-2 md:px-4">
                 <Suspense fallback={<BoardList.Skeleton />}>
-                    <BoardList />
+                    <BoardList organizationId={params.organizationId} />
                 </Suspense>
             </div>
         </div>
