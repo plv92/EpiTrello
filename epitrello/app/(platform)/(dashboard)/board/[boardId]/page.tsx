@@ -20,9 +20,13 @@ const BoardIdPage = async ({
             board: {
                 orgId
             },
+            isArchived: false,
         },
         include: {
             cards: {
+                where: {
+                    isArchived: false,
+                },
                 orderBy: {
                     order: "asc",
                 },

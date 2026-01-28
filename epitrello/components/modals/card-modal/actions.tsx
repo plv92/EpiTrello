@@ -7,6 +7,7 @@ import { Copy, Trash } from "lucide-react";
 import { useAction } from "@/hooks/use-actions";
 import { copyCard } from "@/actions/copy-card";
 import { deleteCard } from "@/actions/delete-card";
+import { archiveCard } from "@/actions/archive-card";
 import { useParams } from "next/navigation";
 import { useCardModal } from "@/hooks/use-card-modal";
 import { toast } from "sonner";
@@ -30,9 +31,20 @@ export const Actions = ({
             toast.error(error);
         }
     });
+
     const { execute: executeDeleteCard, isLoading: isLoadingDelete } = useAction(deleteCard, {
         onSuccess: (data) => {
             toast.success(`Card "${data.title}" deleted`);
+            cardModal.onClose();
+        },
+        onError: (error) => {
+            toast.error(error);
+        }
+    });
+
+    const { execute: executeArchiveCard, isLoading: isLoadingArchive } = useAction(archiveCard, {
+        onSuccess: () => {
+            toast.success(data.isArchived ? "Card unarchived" : "Card archived");
             cardModal.onClose();
         },
         onError: (error) => {
@@ -60,9 +72,7 @@ export const Actions = ({
 
     return (
         <div className="space-y-2 mt-2">
-            <p className="text-xs font-semibold">
-                Actions
-            </p>
+            <p className="text-xs font-semibold">Actions</p>
             <Button
                 onClick={onCopy}
                 disabled={isLoadingCopy}
@@ -82,6 +92,15 @@ export const Actions = ({
             >
                 <Trash className="h-4 w-4 mr-2"/>
                 Delete
+            </Button>
+            <Button
+                onClick={() => executeArchiveCard({ cardId: data.id, archive: !data.isArchived })}
+                disabled={isLoadingArchive}
+                variant={data.isArchived ? "outline" : "gray"}
+                className="w-full justify-start"
+                size="inline"
+            >
+                {data.isArchived ? "Unarchive" : "Archive"}
             </Button>
         </div>
     );

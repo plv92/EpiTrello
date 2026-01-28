@@ -4,8 +4,10 @@ import { Board } from "@prisma/client";
 import { BoardTitleForm } from "./board-title-form";
 import { BoardOptions } from "./board-options";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Archive } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { ArchiveModal } from "@/components/modals/archive-modal";
 
 interface BoardNavbarProps {
     data: Board;
@@ -17,6 +19,7 @@ export const BoardNavbar = ({
     orgId,
 }: BoardNavbarProps) => {
     const router = useRouter();
+    const [isArchiveModalOpen, setIsArchiveModalOpen] = useState(false);
 
     const handleBack = () => {
         router.push(`/organization/${orgId}`);
@@ -34,9 +37,23 @@ export const BoardNavbar = ({
                 Retour
             </Button>
             <BoardTitleForm data={data}/>
-            <div className="ml-auto">
+            <div className="ml-auto flex items-center gap-x-2">
+                <Button
+                    onClick={() => setIsArchiveModalOpen(true)}
+                    variant="ghost"
+                    size="sm"
+                    className="text-white hover:bg-white/20"
+                >
+                    <Archive className="h-4 w-4 mr-2" />
+                    Archives
+                </Button>
                 <BoardOptions id={data.id} />
             </div>
+            <ArchiveModal
+                isOpen={isArchiveModalOpen}
+                onClose={() => setIsArchiveModalOpen(false)}
+                boardId={data.id}
+            />
         </div>
     );
 }

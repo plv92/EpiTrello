@@ -20,6 +20,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { deleteOrganization } from "@/actions/delete-organization";
 
 interface OrganizationSettingsProps {
   organization?: {
@@ -55,11 +56,23 @@ export const OrganizationSettings = ({ organization }: OrganizationSettingsProps
   };
 
   const handleDelete = async () => {
+    if (!organization) return;
+
     setIsLoading(true);
     try {
-      // TODO: Implement delete organization API
-      toast.success("Organisation supprimée");
+      const formData = new FormData();
+      formData.append("organizationId", organization.id);
+      
+      const result = await deleteOrganization(formData);
+      
+      if (result.error) {
+        toast.error(result.error);
+        return;
+      }
+      
+      toast.success("Organisation supprimée avec succès");
       router.push("/select-org");
+      router.refresh();
     } catch (error) {
       toast.error("Erreur lors de la suppression");
     } finally {

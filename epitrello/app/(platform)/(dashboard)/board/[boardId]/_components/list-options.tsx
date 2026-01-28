@@ -14,6 +14,7 @@ import { FormSubmit } from "@/components/form/form-submit";
 import { Separator } from "@/components/ui/separator";
 import { useAction } from "@/hooks/use-actions";
 import { deleteList } from "@/actions/delete-list";
+import { archiveList } from "@/actions/archive-list";
 import { toast } from "sonner";
 import { ElementRef, useRef } from "react";
 import { copyList } from "@/actions/copy-list";
@@ -29,9 +30,19 @@ export const ListOptions = ({
 }: ListOptionsProps) => {
     const closeRef = useRef<ElementRef<"button">>(null);
 
-    const { execute: executeDelete} = useAction(deleteList, {
+    const { execute: executeDelete } = useAction(deleteList, {
         onSuccess: (data) => {
             toast.success(`List ${data.title} deleted`);
+            closeRef.current?.click();
+        },
+        onError: (error) => {
+            toast.error(error);
+        }
+    });
+
+    const { execute: executeArchive, isLoading: isLoadingArchive } = useAction(archiveList, {
+        onSuccess: () => {
+            toast.success(data.isArchived ? "List unarchived" : "List archived");
             closeRef.current?.click();
         },
         onError: (error) => {
@@ -84,6 +95,14 @@ export const ListOptions = ({
                     className="rounded-none w-full h-auto p-2 px-5 justify-start font-normal text-sm" variant="ghost"
                 >
                     Add Card...
+                </Button>
+                <Button
+                    onClick={() => executeArchive({ listId: data.id, archive: !data.isArchived })}
+                    disabled={isLoadingArchive}
+                    className="rounded-none w-full h-auto p-2 px-5 justify-start font-normal text-sm"
+                    variant={data.isArchived ? "outline" : "ghost"}
+                >
+                    {data.isArchived ? "Unarchive list" : "Archive list"}
                 </Button>
                 <form
                     action={onCopy}
