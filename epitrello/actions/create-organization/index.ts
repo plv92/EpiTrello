@@ -29,6 +29,28 @@ export async function createOrganization(formData: FormData) {
 
   const { name } = validatedFields.data;
 
+  // Vérifier si l'utilisateur a déjà créé une organisation avec ce nom
+  const existingUserOrg = await db.organizationMember.findFirst({
+    where: {
+      userId,
+      organization: {
+        name: {
+          equals: name,
+          mode: 'insensitive', // Comparaison insensible à la casse
+        },
+      },
+    },
+    include: {
+      organization: true,
+    },
+  });
+
+  if (existingUserOrg) {
+    return {
+      error: "Vous avez déjà créé une organisation avec ce nom",
+    };
+  }
+
   // Créer un slug à partir du nom
   let baseSlug = name
     .toLowerCase()
